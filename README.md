@@ -1,19 +1,3 @@
-We need to add a dedicated Docker section to the README, so users can deploy Beatzy with just two files. The section should include:
-
-- **Prerequisites** – Docker and Docker Compose.
-- **Files** – show the exact content of `Dockerfile` and `docker-compose.yml` (they fetch the code from GitHub at build time).
-- **Environment variables** – via `.env` file.
-- **Optional `cookies.txt`** – mounting for YouTube.
-- **Build and run commands**.
-- **Update instructions**.
-
-Here's the additional content to insert **after the "Running the Bot" section** (or create a new section after Quick Start). I'll provide the full README with the Docker part integrated.
-
----
-
-## Updated README.md (with Docker section)
-
-```markdown
 # Beatzy – Discord Music Bot
 
 **Beatzy** is a self‑hosted, open‑source Discord music bot built with Python, `discord.py`, and `yt‑dlp`.  
