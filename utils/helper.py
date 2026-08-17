@@ -95,7 +95,7 @@ class MusicHelpers:
         # FFmpeg source (from local file)
         # ----------------------------------------------------
         # No reconnect needed; we'll use PCM with high bitrate.
-        FFMPEG_OPTIONS = "-vn -b:a 192k"
+        FFMPEG_OPTIONS = "-vn -b:a 192k -ar 48000 -ac 2 -bufsize 192k"
         source = discord.FFmpegPCMAudio(
             source_path,
             options=FFMPEG_OPTIONS,
@@ -120,7 +120,7 @@ class MusicHelpers:
         vc.play(
             source,
             after=after_play,
-            bitrate=192,   # Discord will encode PCM to Opus at 192 kbps
+            bitrate=256,
         )
 
         # ----------------------------------------------------

@@ -71,7 +71,7 @@ def _build_ydl_options(
         # ----------------------------------------------------
         
         "format": (
-            "bestaudio[acodec=opus]/"
+            # "bestaudio[acodec=opus]/"
             "bestaudio/"
             "best"
         ),
