@@ -1,19 +1,3 @@
-We need to add a dedicated Docker section to the README, so users can deploy Beatzy with just two files. The section should include:
-
-- **Prerequisites** – Docker and Docker Compose.
-- **Files** – show the exact content of `Dockerfile` and `docker-compose.yml` (they fetch the code from GitHub at build time).
-- **Environment variables** – via `.env` file.
-- **Optional `cookies.txt`** – mounting for YouTube.
-- **Build and run commands**.
-- **Update instructions**.
-
-Here's the additional content to insert **after the "Running the Bot" section** (or create a new section after Quick Start). I'll provide the full README with the Docker part integrated.
-
----
-
-## Updated README.md (with Docker section)
-
-```markdown
 # Beatzy – Discord Music Bot
 
 **Beatzy** is a self‑hosted, open‑source Discord music bot built with Python, `discord.py`, and `yt‑dlp`.  
@@ -102,13 +86,13 @@ Just create two files and one environment file – the code is pulled from GitHu
 FROM python:3.12-slim
 
 # Install system dependencies: FFmpeg, Opus, Git, and build tools
-RUN apt-get update &amp;&amp; apt-get install -y \
+RUN apt-get update && apt-get install -y \
     ffmpeg \
     libopus-dev \
     git \
     gcc \
     g++ \
-    &amp;&amp; rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
@@ -120,7 +104,7 @@ RUN git clone https://github.com/Niksun69/beatzy.git .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Create a non-root user for security
-RUN useradd -m -u 1000 botuser &amp;&amp; chown -R botuser /app
+RUN useradd -m -u 1000 botuser && chown -R botuser /app
 USER botuser
 
 # Command to run the bot
