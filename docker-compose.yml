@@ -1,13 +1,14 @@
 version: '3.8'
 
 services:
-  music-bot:
+  beatzy:
     build: .
-    container_name: discord-music-bot
+    container_name: beatzy
     restart: unless-stopped
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - DISCORD_ID=${DISCORD_ID}
     volumes:
-      - ./data:/app/data
-      - ./temp:/app/temp
-      - ./cookies.txt:/app/cookies.txt
+      - ./cookies.txt:/app/cookies.txt   # optional, for YouTube cookies
     stdin_open: true
     tty: true
