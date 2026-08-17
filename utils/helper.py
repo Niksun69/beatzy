@@ -38,10 +38,12 @@ class MusicHelpers:
             await interaction.followup.send(
                 embed=error_embed(
                     "❌ Extraction Failed",
-                    "Could not extract audio from that URL.",
+                    "Could not extract audio from that URL. Skipping to next track.",
                 ),
                 ephemeral=True,
             )
+            # Skip this track and move to the next
+            await self._play_next(interaction)
             return
     
         title = info.get("title", "Unknown Track")
