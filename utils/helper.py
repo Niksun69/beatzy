@@ -339,61 +339,71 @@ class MusicHelpers:
     # ========================================================
     async def _update_now_playing_loop(self, interaction, guild_id):
         """
-        Background loop that updates the Now Playing embed with
-        elapsed time every 2 seconds.
+        Background loop that updates the Now Playing embed with elapsed time every 2 seconds.
         """
-        # Wait a moment for the voice client to start playing.
-        await asyncio.sleep(1)
-
-        vc = interaction.guild.voice_client
-        if not vc:
-            return
+        await asyncio.sleep(1)  # wait for playback to start
 
         while True:
-            # Check if we should still update
-            if guild_id not in self.update_tasks:
-                break
-            if not vc or not (vc.is_playing() or vc.is_paused()):
-                break
-
-            # Get current track info
-            track = get_current_track(guild_id)
-            if not track:
-                break
-
-            # Calculate elapsed time (accounting for pauses)
-            elapsed = self._get_elapsed(guild_id)
-
-            # Build updated embed
-            queue = get_queue(guild_id)
-            embed = now_playing_with_progress(
-                title=track.get('title', 'Unknown'),
-                url=track.get('url', ''),
-                thumbnail=track.get('thumbnail'),
-                elapsed=elapsed,
-                duration=track.get('duration', 0),
-                queue_count=len(queue),
-                paused=vc.is_paused(),
-            )
-
-            # Edit the stored message
-            msg = self.current_messages.get(guild_id)
-            view = self.current_views.get(guild_id)
-            if msg:
-                try:
-                    if view:
-                        await msg.edit(embed=embed, view=view)   # reuse the view
-                    else:
-                        # fallback – should not happen
-                        await msg.edit(embed=embed, view=MusicControlView(self, guild_id))
-                        self.current_views[guild_id] = view
-                except (discord.NotFound, discord.HTTPException):
+            try:
+                # Use bot.get_guild to avoid stale interaction
+                guild = self.bot.get_guild(guild_id)
+                if not guild:
                     break
+                vc = guild.voice_client
+                if not vc:
+                    break
+
+                # Check if the task was cancelled
+                if guild_id not in self.update_tasks:
+                    break
+
+                # Get current track info
+                track = get_current_track(guild_id)
+                if not track:
+                    # No track yet, wait and retry
+                    await asyncio.sleep(2)
+                    continue
+
+                # Calculate elapsed time
+                elapsed = self._get_elapsed(guild_id)
+
+                # Build updated embed
+                queue = get_queue(guild_id)
+                embed = now_playing_with_progress(
+                    title=track.get('title', 'Unknown'),
+                    url=track.get('url', ''),
+                    thumbnail=track.get('thumbnail'),
+                    elapsed=elapsed,
+                    duration=track.get('duration', 0),
+                    queue_count=len(queue),
+                    paused=vc.is_paused() if vc else False,
+                )
+
+                # Edit the stored message
+                msg = self.current_messages.get(guild_id)
+                view = self.current_views.get(guild_id)
+                if msg:
+                    try:
+                        if view:
+                            await msg.edit(embed=embed, view=view)
+                        else:
+                            # fallback – create a new view
+                            new_view = MusicControlView(self, guild_id)
+                            await msg.edit(embed=embed, view=new_view)
+                            self.current_views[guild_id] = new_view
+                    except (discord.NotFound, discord.HTTPException):
+                        # Message deleted – stop updating
+                        break
+
+            except Exception as e:
+                print(f"[Update Loop] Error in guild {guild_id}: {e}")
+                # Don't break, keep trying
 
             await asyncio.sleep(2)  # update every 2 seconds
 
         # Clean up when loop exits
         self.update_tasks.pop(guild_id, None)
+        print(f"[Update Loop] Stopped for guild {guild_id}")
 
     # ========================================================
     # GET ELAPSED TIME (including pauses)
