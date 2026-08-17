@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  music-bot:
+    build: .
+    container_name: discord-music-bot
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+      - ./temp:/app/temp
+      - ./cookies.txt:/app/cookies.txt
+    stdin_open: true
+    tty: true
