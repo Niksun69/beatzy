@@ -16,8 +16,8 @@ async def on_ready():
     load_queues_from_db()
     print(f"Logged in as {bot.user}")
 
-    # await bot.tree.sync()
-    # print("Commands synced globally.")
+    await bot.tree.sync()
+    print("Commands synced globally.")
     # # Optionally also sync to guild
     # guild = discord.Object(id=TEST_GUILD_ID)
     # await bot.tree.sync(guild=guild)
