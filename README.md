@@ -191,6 +191,7 @@ docker-compose up -d
 | `/purge [count]` | Delete bot messages in the channel |
 | `/about` | Information about the bot |
 | `/help` | Show help menu |
+| `/lol`  | Show summoner profile from League of Legends 
 
 ---
 
