@@ -2,22 +2,22 @@ from discord.ext import commands
 
 from utils.helper import MusicHelpers
 
-from .commands.play import PlayMixin
-from .commands.skip import SkipMixin
-from .commands.pause import PauseMixin
-from .commands.resume import ResumeMixin
-from .commands.stop import StopMixin
-from .commands.skip import SkipMixin
-from .commands.clear import ClearMixin
-from .commands.leave import LeaveMixin
-from .commands.now import NowMixin
-from .commands.shuffle import ShuffleMixin
-from .commands.queue import QueueMixin
-from .commands.help import HelpMixin
-from .commands.purge import PurgeMixin
-from .commands.stay import StayMixin
-from .commands.loop import LoopMixin
-from .commands.about import AboutMixin
+from .music_commands.play import PlayMixin
+from .music_commands.skip import SkipMixin
+from .music_commands.pause import PauseMixin
+from .music_commands.resume import ResumeMixin
+from .music_commands.stop import StopMixin
+from .music_commands.skip import SkipMixin
+from .music_commands.clear import ClearMixin
+from .music_commands.leave import LeaveMixin
+from .music_commands.now import NowMixin
+from .music_commands.shuffle import ShuffleMixin
+from .music_commands.queue import QueueMixin
+from .music_commands.help import HelpMixin
+from .music_commands.purge import PurgeMixin
+from .music_commands.stay import StayMixin
+from .music_commands.loop import LoopMixin
+from .music_commands.about import AboutMixin
 
 
 class Music(
@@ -58,6 +58,4 @@ class Music(
 
 
 async def setup(bot):
-    await bot.add_cog(
-        Music(bot)
-    )
+    await bot.add_cog(Music(bot))

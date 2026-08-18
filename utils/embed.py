@@ -332,7 +332,7 @@ def queue_embed(queue, page=0, per_page=10, thumbnail=None):
             inline=False
         )
     
-    # Add footer with total duration (optional)
+    # Add footer with total duration
     total_duration = sum(t.get('duration') or 0 for t in queue)
     if total_duration > 0:
         embed.set_footer(text=f"Total duration: {format_duration(total_duration)}")

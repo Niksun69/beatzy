@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from typing import Optional
 from utils.embed import error_embed, info_embed, success_embed
+from utils.spotify import get_spotify_track
 from utils.voice import get_queue, save_queue_to_db
 from utils.yt import extract_info, get_playlist_entries, is_valid_video_id
 from config import YTDLP_COOKIES
@@ -61,7 +62,7 @@ class PlayMixin:
         # ====================================================
         # PLAYLIST (if query contains list= or playlist)
         # ====================================================
-        if "list=" in query or "playlist" in query.lower():
+        if "list=" in query or "playlist" in query.lower() or "/sets/" in query:
             entries = get_playlist_entries(query, cookies=YTDLP_COOKIES)
             if not entries:
                 await interaction.followup.send(
@@ -112,6 +113,20 @@ class PlayMixin:
         # ====================================================
         # SINGLE TRACK (URL or search)
         # ====================================================
+        spotify_metadata = None
+
+        if "open.spotify.com/track/" in query:
+            spotify_metadata = get_spotify_track(query)
+            if not spotify_metadata:
+                await interaction.followup.send(
+                    embed=error_embed("❌ Spotify Error", "Could not fetch track info."),
+                    ephemeral=True,
+                )
+                return
+            # Use the Spotify search query to find a YouTube video
+            query = spotify_metadata["search_query"]
+
+        # Extract YouTube video info (we need the actual audio URL)
         info = extract_info(query, cookies=YTDLP_COOKIES)
         if not info:
             await interaction.followup.send(
@@ -123,15 +138,16 @@ class PlayMixin:
             )
             return
 
+        # Build track dict – prefer Spotify metadata if available
         track = {
-            "url": info.get("webpage_url") or query,
-            "title": info.get("title", "Unknown Track"),
-            "duration": info.get("duration", 0),
-            "artist": info.get("artist"),
-            "thumbnail": info.get("thumbnail"),
+            "url": info.get("webpage_url") or query,               # always from YouTube
+            "title": spotify_metadata.get("title") if spotify_metadata else info.get("title", "Unknown Track"),
+            "duration": spotify_metadata.get("duration") if spotify_metadata else info.get("duration", 0),
+            "artist": spotify_metadata.get("artist") if spotify_metadata else info.get("artist"),
+            "thumbnail": info.get("thumbnail"),                    # you can also grab album art from Spotify
         }
 
-        # If already playing, just add to queue
+        # If already playing, add to queue; otherwise play immediately
         if vc and (vc.is_playing() or vc.is_paused()):
             queue.append(track)
             save_queue_to_db(guild_id)
@@ -139,7 +155,6 @@ class PlayMixin:
                 embed=info_embed("📥 Added to Queue", f"**{track['title']}**")
             )
         else:
-            # Not playing – connect if needed and play immediately
             if vc is None:
                 channel = interaction.user.voice.channel
                 await channel.connect()
