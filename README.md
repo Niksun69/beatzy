@@ -1,3 +1,5 @@
+# Warning: Still in development it may need some tweaks done to make it work
+
 # Beatzy – Discord Music Bot
 
 **Beatzy** is a self‑hosted, open‑source Discord music bot built with Python, `discord.py`, and `yt‑dlp`.  
